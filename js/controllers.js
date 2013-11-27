@@ -38,7 +38,7 @@ function LatestSongsListCtrl($scope, $interval, LatestSongs){
                 makeSongNotification(newSongs[0].artist, newSongs[0].title);
             }
         });
-    }, 30 * 1000);
+    }, 15 * 1000);
 }
 
 function makeSongNotification(artist, title){
