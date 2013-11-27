@@ -4,11 +4,14 @@ from bs4 import BeautifulSoup
 import calendar
 from datetime import datetime
 import json
+import pytz
 import requests
 import sys
 
 
 LAST_PLAYED_URL = 'http://nol888.com/~nlum/caa-radio.php'
+TIME_ZONES = {'PST': pytz.timezone('America/Los_Angeles'),
+              'PDT': pytz.timezone('America/Los_Angeles')}
 
 
 if __name__ == '__main__':
@@ -37,8 +40,16 @@ if __name__ == '__main__':
         date_cell = cells[0]
         song_cell = cells[1]
 
+        tz_abbrevation = date_cell.text.rsplit(' ', 1)[1]
+
+        # strptime throws away the timezone information from %Z
         timestamp = datetime.strptime(date_cell.text,
                                       "%B %d, %Y %I:%M:%S%p %Z")
+
+        timezone = TIME_ZONES[tz_abbrevation]
+        if tz_abbrevation in TIME_ZONES:
+            timezone = TIME_ZONES[tz_abbrevation]
+            timestamp = timezone.localize(timestamp)
 
         if ' - ' in song_cell.text:
             (artist, title) = song_cell.text.split(' - ', 1)
@@ -46,6 +57,8 @@ if __name__ == '__main__':
             artist = None
             title = song_cell.text
 
+        # The returned timestamps are always in UTC.
+        # Leave it up to the frontend to localize.
         ret['songs'].append({
             'timestamp': calendar.timegm(timestamp.utctimetuple()),
             'artist': artist,
