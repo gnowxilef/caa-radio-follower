@@ -1,12 +1,15 @@
 'use strict';
 
+// the max this limit can be is the number of results that the JSON generator gives us
+var maxNumSongsToDisplay = 20;
+
 function LatestSongsListCtrl($scope, $interval, LatestSongs){
     var maxTimestamp;
     $scope.songs = [];
 
     // inital populating of list of songs
     LatestSongs.get({}, function(latestSongs){
-        $scope.songs = latestSongs.songs;
+        $scope.songs = latestSongs.songs.slice(0, maxNumSongsToDisplay);
 
         // the most recent played song is first
         if(latestSongs.songs.length > 0){
@@ -29,7 +32,7 @@ function LatestSongsListCtrl($scope, $interval, LatestSongs){
             }
 
             if(newSongs.length > 0){
-                $scope.songs = newSongs.concat($scope.songs);
+                $scope.songs = newSongs.concat($scope.songs).slice(0, maxNumSongsToDisplay);
                 //console.log(new Date() + " - Added " + newSongs.length + " songs");
 
                 maxTimestamp = newSongs[0].timestamp;
