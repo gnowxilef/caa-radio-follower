@@ -1,6 +1,5 @@
 'use strict';
 
-var poop;
 function LatestSongsListCtrl($scope, $interval, LatestSongs){
     var maxTimestamp;
     $scope.songs = [];
@@ -35,7 +34,36 @@ function LatestSongsListCtrl($scope, $interval, LatestSongs){
 
                 maxTimestamp = newSongs[0].timestamp;
                 //console.log("New maxTimestamp is now " + maxTimestamp);
+
+                makeSongNotification(newSongs[0].artist, newSongs[0].title);
             }
         });
     }, 30 * 1000);
+}
+
+function makeSongNotification(artist, title){
+    // mostly copied from https://developer.mozilla.org/en-US/docs/Web/API/notification
+    var notification;
+
+    var options = {};
+    if(artist != null){
+        options['body'] = artist;
+    }
+
+    if(!("Notification" in window)) {
+        console.log("This browser does not support desktop notification");
+    } else if (Notification.permission === "granted") {
+        notification = new Notification(title, options);
+    } else if (Notification.permission !== "denied") {
+        Notification.requestPermission(function (permission) {
+            if(!("permission" in Notification)) {
+                Notification.permission = permission;
+            }
+
+            if (permission === "granted") {
+                notification = new Notification(title, options);
+            }
+        });
+    }
+    return notification;
 }
