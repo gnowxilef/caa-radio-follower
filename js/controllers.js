@@ -49,6 +49,7 @@ function makeSongNotification(artist, title){
     if(artist != null){
         options['body'] = artist;
     }
+    options['icon'] = 'img/caa-radio-icon.png';
 
     if(!("Notification" in window)) {
         console.log("This browser does not support desktop notification");
